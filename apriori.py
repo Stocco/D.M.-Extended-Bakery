@@ -1,5 +1,7 @@
 import csv
 import re
+from numpy import *
+
 
 
 def map_bin(num):
@@ -115,6 +117,8 @@ def aprioriGen(Lk,k):
         retList.append(Lk[i] | Lk[j])
   return retList
 
+
+#Apriori Function and its helpers
 def apriori(dataSet, minSuport = 0.5):
   C1 = createC1(dataSet)
   D = list(map(set, dataSet))
@@ -128,7 +132,6 @@ def apriori(dataSet, minSuport = 0.5):
     L.append(Lk)
     k += 1
   return L,suportData
-
 
 def readCSV2(url):
     with open(url) as file:
@@ -158,7 +161,6 @@ def generateRules(L,supportData, minConf=0.7):
         calcConf(freqSet,H1,supportData,bigRulelist,minConf)
   return bigRulelist
 
-
 def calcConf(freqSet, H, supportData, brl, minConf=0.7):
   prunedH = []
   for conseq in H:
@@ -169,7 +171,6 @@ def calcConf(freqSet, H, supportData, brl, minConf=0.7):
       prunedH.append(conseq)
   return prunedH
 
-
 def rulesFromConseq(freqSet, H, supportData, brl, minConf=0.7):
   m = len(H[0])
   if (len(freqSet) > (m + 1)):
@@ -178,6 +179,53 @@ def rulesFromConseq(freqSet, H, supportData, brl, minConf=0.7):
     if (len(Hmp1) > 1):
       rulesFromConseq(freqSet, Hmp1, supportData, brl, minConf)
 
+#Clustering Function
+def loadDataSet(fileName):
+ dataMat = []
+ fr = open(fileName)
+ for line in fr.readlines():
+   curLine = line.strip().split(',')
+   del curLine[0]
+   fltLine = map(float,curLine)
+ dataMat.append(fltLine)
+ return dataMat
+
+def distEclud(vecA, vecB): return sqrt(sum(power(vecA - vecB, 2)))
+
+def randCent(dataSet, k):
+ n = shape(dataSet)[1]
+ centroids = mat(zeros((k,n)))
+ for j in range(n):
+   minJ = min(dataSet[:,j])
+   rangeJ = float(max(dataSet[:,j]) - minJ)
+   centroids[:,j] = minJ + rangeJ * random.rand(k,1)
+ return centroids
+
+def kMeans(dataSet, k, distMeas=distEclud, createCent=randCent):
+ m = shape(dataSet)[0]
+ clusterAssment = mat(zeros((m,2)))
+ centroids = createCent(dataSet, k)
+ clusterChanged = True
+ while clusterChanged:
+   clusterChanged = False
+   for i in range(m):
+    minDist = inf; minIndex = -1
+    for j in range(k):
+      distJI = distMeas(centroids[j,:],dataSet[i,:])
+      if distJI < minDist:
+        minDist = distJI; minIndex = j
+    if clusterAssment[i,0] != minIndex: clusterChanged = True
+    clusterAssment[i,:] = minIndex,minDist**2
+   print(centroids)
+   for cent in range(k):
+    ptsInClust = dataSet[nonzero(clusterAssment[:,0].A==cent)[0]]
+    centroids[cent,:] = mean(ptsInClust, axis=0)
+ return centroids, clusterAssment
+
+
+
+
+#action functions
 
 def main(support, confidence):
   print('5000 receipts')
@@ -196,15 +244,6 @@ def main(support, confidence):
   test, sup = apriori(list(readCSV2("75000-out1.csv")), support)
   generateRules(test, sup, confidence)
 
-main(0.05, 0.6)
 
-# output = createC1(readCSV("5000-out1.csv"))
-# print(output)
-# print(test[0])
-# print(test[1])
-# print(test[2])
-# print(test[3])
-
-# for i in test:
-#     print(i)
+data = loadDataSet("5000-out1.csv")
 
