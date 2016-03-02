@@ -1,12 +1,8 @@
-import csv
 import re
 from numpy import *
-from sklearn.cluster import DBSCAN
-from sklearn import metrics
-from sklearn.datasets.samples_generator import make_blobs
-from sklearn.preprocessing import StandardScaler
 
 
+#Helper functions
 def map_bin(num):
     bin_map = {
         #  Cakes (0)
@@ -79,7 +75,6 @@ def map_bin(num):
         49: 'espresso'
     }
     return str(bin_map[num])
-
 
 def map_num(num):
     bin_map = {
@@ -255,7 +250,8 @@ def rulesFromConseq(freqSet, H, supportData, brl, minConf=0.7):
     if (len(Hmp1) > 1):
       rulesFromConseq(freqSet, Hmp1, supportData, brl, minConf)
 
-#Clustering Function
+
+#Clustering Function from scratch
 def loadDataSet(fileName):
  dataMat = []
  fr = open(fileName)
@@ -299,26 +295,7 @@ def kMeans(dataSet, k, distMeas=distEclud, createCent=randCent):
  return centroids, clusterAssment
 
 
-
-
-#action functions
-
-def main(support, confidence):
-  print('5000 receipts')
-  test, sup = apriori(list(readCSV2("5000-out1.csv")), support)
-  generateRules(test, sup, confidence)
-
-  print("   ")
-
-  print('20000 receipts')
-  test, sup = apriori(list(readCSV2("20000-out1.csv")), support)
-  generateRules(test, sup, confidence)
-
-  print("   ")
-
-  print('75000 receipts')
-  test, sup = apriori(list(readCSV2("75000-out1.csv")), support)
-  generateRules(test, sup, confidence)
+#CLustering functions for weka
 
 def booleanMap(value):
     map ={
@@ -326,7 +303,6 @@ def booleanMap(value):
         "1":"t"
     }
     return map[value]
-
 
 def filter(filename):
     newFile=[]
@@ -345,6 +321,35 @@ def filter(filename):
         output.write("\n")
     output.close()
 
+def vectorizeBins(filename):
+    newFile=[]
+    vectorized=[]
+    fr = open(filename)
+
+
+    for line in fr.readlines():
+        line = re.sub('[\s+]','',line)
+        line = line.split(',')
+        del line[0]
+        line = [map_num(i) for i in line]
+        newFile.append(line)
+
+    for tid in newFile:
+        curVec=[]
+        for build in range(18):
+            if(tid.count(str(build))): curVec.append("t")
+            else: curVec.append("?")
+        vectorized.append(curVec)
+
+
+    output = open("output2.arff", "w")
+    for line in vectorized:
+        for i,value in enumerate(line):
+            if(i == len(line)-1):output.write(value)
+            else: output.write(value+",")
+        output.write("\n")
+    output.close()
+    return vectorized
 
 def vectorize(filename):
     newFile=[]
@@ -376,7 +381,7 @@ def vectorize(filename):
     output.close()
     return vectorized
 
-def transposer(matrix):
+def transposer(matrix,outputfile):
     transpose_mat = []
     for col in range(len(matrix[0])):
         transposed_row = []
@@ -389,7 +394,7 @@ def transposer(matrix):
 
         transpose_mat.append(transposed_row)
 
-    output = open("transposed_bin_output.arff", "w")
+    output = open(outputfile, "w")
     for line in transpose_mat:
         for i,value in enumerate(line):
             if(i == len(line)-1):output.write(value)
@@ -398,11 +403,26 @@ def transposer(matrix):
     output.close()
     return transpose_mat
 
-matrix = vectorize("75000-out1.csv")
-transposed_matrix = transposer(matrix)
 
+#action functions
 
+def main(support, confidence):
+  print('5000 receipts')
+  test, sup = apriori(list(readCSV2("5000-out1.csv")), support)
+  generateRules(test, sup, confidence)
 
-output = open("labels.txt", "w")
-for i in range(75000):
-    output.write("@attribute t"+str(i)+" { t}"+"\n")
+  print("   ")
+
+  print('20000 receipts')
+  test, sup = apriori(list(readCSV2("20000-out1.csv")), support)
+  generateRules(test, sup, confidence)
+
+  print("   ")
+
+  print('75000 receipts')
+  test, sup = apriori(list(readCSV2("75000-out1.csv")), support)
+  generateRules(test, sup, confidence)
+
+matrix = vectorizeBins("75000-out1.csv")
+transposed_matrix = transposer(matrix,"output_general")
+
