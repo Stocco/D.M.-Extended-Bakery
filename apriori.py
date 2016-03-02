@@ -398,11 +398,11 @@ def transposer(matrix):
     output.close()
     return transpose_mat
 
-matrix = vectorize("5000-out1.csv")
+matrix = vectorize("75000-out1.csv")
 transposed_matrix = transposer(matrix)
-print(transposed_matrix)
 
 
-output = open("labels.txt", "w")
-for i in range(75000):
-    output.write("@attribute t"+str(i)+" { t}"+"\n")
+
+#output = open("labels.txt", "w")
+#for i in range(75000):
+ #   output.write("@attribute t"+str(i)+" { t}"+"\n")
