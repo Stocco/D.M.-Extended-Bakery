@@ -1,7 +1,10 @@
 import csv
 import re
 from numpy import *
-
+from sklearn.cluster import DBSCAN
+from sklearn import metrics
+from sklearn.datasets.samples_generator import make_blobs
+from sklearn.preprocessing import StandardScaler
 
 
 def map_bin(num):
@@ -77,6 +80,79 @@ def map_bin(num):
     }
     return str(bin_map[num])
 
+
+def map_num(num):
+    bin_map = {
+    # Cakes (0)
+    0: '0', # Chocolate
+    1: '0', # Lemon
+    2: '0', # ...
+    3: '0',
+    4: '0',
+    5: '0',
+    9: '0', # Napoleon
+    # Eclairs (1)
+    6: '1',
+    7: '1',
+    8: '1',
+    # Tart (2)
+    10: '2',
+    12: '2',
+    13: '2',
+    14: '2',
+    15: '2',
+    16: '2',
+    17: '2',
+    18: '2',
+    19: '2',
+    20: '2',
+    # Pie (3)
+    11: '3',
+    # Cookies (4)
+    21: '4',
+    22: '4',
+    23: '4',
+    24: '4',
+    27: '4',
+    28: '4',
+    29: '4',
+    # Meringue (5)
+    25: '5',
+    26: '5',
+    # Croissant (6)
+    30: '6',
+    31: '6',
+    32: '6',
+    33: '6',
+    34: '6',
+    # Danish (7)
+    35: '7',
+    36: '7',
+    39: '7',
+    # Twist (8)
+    37: '8',
+    # Bear Claw (9)
+    38: '9',
+    # Lemonade (10)
+    40: '10',
+    41: '10',
+    # Juice (11)
+    42: '11',
+    # Tea (12)
+    43: '12',
+    # Water (13)
+    44: '13',
+    # Coffee (14)
+    45: '14',
+    46: '14',
+    # Frappuccino (15)
+    47: '15',
+    # Soda (16)
+    48: '16',
+    # Espresso (17)
+    49: '17'
+    }
+    return str(bin_map[int(num)])
 
 def createC1(data):
   c1=[]
@@ -186,8 +262,8 @@ def loadDataSet(fileName):
  for line in fr.readlines():
    curLine = line.strip().split(',')
    del curLine[0]
-   fltLine = map(float,curLine)
- dataMat.append(fltLine)
+   fltLine = curLine
+   dataMat.append(fltLine)
  return dataMat
 
 def distEclud(vecA, vecB): return sqrt(sum(power(vecA - vecB, 2)))
@@ -244,6 +320,60 @@ def main(support, confidence):
   test, sup = apriori(list(readCSV2("75000-out1.csv")), support)
   generateRules(test, sup, confidence)
 
+def booleanMap(value):
+    map ={
+        "0":"?",
+        "1":"t"
+    }
+    return map[value]
 
-data = loadDataSet("5000-out1.csv")
 
+def filter(filename):
+    newFile=[]
+    fr = open(filename)
+    for line in fr.readlines():
+         curLine = line.strip().split(',')
+         del curLine[0]
+         curLine = [booleanMap(i) for i in curLine]
+         newFile.append(curLine)
+
+    output = open("output.arff", "w")
+    for line in newFile:
+        for i,value in enumerate(line):
+            if(i == len(line)-1):output.write(value)
+            else: output.write(value+",")
+        output.write("\n")
+    output.close()
+
+
+def vectorize(filename):
+    newFile=[]
+    vectorized=[]
+    fr = open(filename)
+
+
+    for line in fr.readlines():
+        line = re.sub('[\s+]','',line)
+        line = line.split(',')
+        del line[0]
+        line = [map_num(i) for i in line]
+        newFile.append(line)
+
+    for tid in newFile:
+        curVec=[]
+        for build in range(17):
+            if(tid.count(str(build))): curVec.append("t")
+            else: curVec.append("?")
+        vectorized.append(curVec)
+
+
+        output = open("output2.arff", "w")
+    for line in vectorized:
+        for i,value in enumerate(line):
+            if(i == len(line)-1):output.write(value)
+            else: output.write(value+",")
+        output.write("\n")
+    output.close()
+
+
+vectorize("75000-out1.csv")
