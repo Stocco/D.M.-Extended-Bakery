@@ -403,6 +403,6 @@ transposed_matrix = transposer(matrix)
 
 
 
-#output = open("labels.txt", "w")
-#for i in range(75000):
- #   output.write("@attribute t"+str(i)+" { t}"+"\n")
+output = open("labels.txt", "w")
+for i in range(75000):
+    output.write("@attribute t"+str(i)+" { t}"+"\n")
