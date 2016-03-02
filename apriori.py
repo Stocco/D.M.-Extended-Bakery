@@ -361,12 +361,11 @@ def vectorize(filename):
         line = re.sub('[\s+]','',line)
         line = line.split(',')
         del line[0]
-        line = [map_num(i) for i in line]
         newFile.append(line)
 
     for tid in newFile:
         curVec=[]
-        for build in range(18):
+        for build in range(50):
             if(tid.count(str(build))): curVec.append("t")
             else: curVec.append("?")
         vectorized.append(curVec)
@@ -423,6 +422,6 @@ def main(support, confidence):
   test, sup = apriori(list(readCSV2("75000-out1.csv")), support)
   generateRules(test, sup, confidence)
 
-matrix = vectorizeBins("75000-out1.csv")
+matrix = vectorize("75000-out1.csv")
 transposed_matrix = transposer(matrix,"output_general")
 
