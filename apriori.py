@@ -389,7 +389,7 @@ def transposer(matrix):
 
         transpose_mat.append(transposed_row)
 
-    output = open("transposed_output.arff", "w")
+    output = open("transposed_bin_output.arff", "w")
     for line in transpose_mat:
         for i,value in enumerate(line):
             if(i == len(line)-1):output.write(value)
