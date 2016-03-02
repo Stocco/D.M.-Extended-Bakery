@@ -361,19 +361,58 @@ def vectorize(filename):
 
     for tid in newFile:
         curVec=[]
-        for build in range(17):
+        for build in range(18):
             if(tid.count(str(build))): curVec.append("t")
             else: curVec.append("?")
         vectorized.append(curVec)
 
 
-        output = open("output2.arff", "w")
+    output = open("output2.arff", "w")
     for line in vectorized:
         for i,value in enumerate(line):
             if(i == len(line)-1):output.write(value)
             else: output.write(value+",")
         output.write("\n")
     output.close()
+    return vectorized
+
+def transposer(matrix):
+    transpose_mat = []
+    for col in range(len(matrix[0])):
+        transposed_row = []
+        for row in range(len(matrix)):
+
+            if(matrix[row][col] == 't'):
+                transposed_row.append('t')
+            else:
+                transposed_row.append('?')
+
+        transpose_mat.append(transposed_row)
+
+    output = open("transposed_output.arff", "w")
+    for line in transpose_mat:
+        for i,value in enumerate(line):
+            if(i == len(line)-1):output.write(value)
+            else: output.write(value+",")
+        output.write("\n")
+    output.close()
+    return transpose_mat
+
+matrix = vectorize("5000-out1.csv")
+transposed_matrix = transposer(matrix)
+print(transposed_matrix)
 
 
-vectorize("75000-out1.csv")
+
+
+
+# emptymatrix=[]
+# for i in range(18):
+#     row=[]
+#     for j in range(75000):
+#         row.append("?")
+#     emptymatrix.append(row)
+#
+#
+# for line in emptymatrix:
+#     print(line)
