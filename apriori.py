@@ -371,7 +371,7 @@ def vectorize(filename):
         vectorized.append(curVec)
 
 
-    output = open("output2.arff", "w")
+    output = open("outputRaw.arff", "w")
     for line in vectorized:
         for i,value in enumerate(line):
             if(i == len(line)-1):output.write(value)
@@ -423,5 +423,5 @@ def main(support, confidence):
   generateRules(test, sup, confidence)
 
 matrix = vectorize("75000-out1.csv")
-transposed_matrix = transposer(matrix,"output_general")
+#transposed_matrix = transposer(matrix,"output_general")
 
